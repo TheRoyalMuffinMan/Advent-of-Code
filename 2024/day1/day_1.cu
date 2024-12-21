@@ -254,8 +254,7 @@ std::string parseArgs(std::int32_t& argc, char* argv[]) {
 void parseFile(std::string& filename, 
                std::unique_ptr<InputData>& data, 
                std::function<void(std::istringstream, std::unique_ptr<InputData>&)> func) {
-
-    std::vector<std::int32_t> left, right;
+                
     std::ifstream file(filename);
     std::string line;
 
