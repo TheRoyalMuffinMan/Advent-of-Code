@@ -109,8 +109,7 @@ void solvePartTwo(std::unique_ptr<InputData>& data) {
 void usage(char* argv[]) {
     std::cout << "Usage: " << argv[0] <<" [OPTIONS]" << std::endl
               << "Options:" << std::endl
-              << "  -f, --file <file>    Advent of code sample file" << std::endl
-              << "  -debug, --debug      Sets debug flag" << std::endl;
+              << "  -f, --file <file>    Advent of code sample file" << std::endl;
 
     return;
 }

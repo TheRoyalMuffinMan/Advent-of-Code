@@ -9,7 +9,6 @@
 #include <functional>
 #include <cuda_runtime_api.h>
 
-
 // Set to 0 to disable debugging
 #define DDEBUG 1
 #define MAX_GPU_THREADS 256
@@ -222,8 +221,7 @@ void solvePartTwo(std::unique_ptr<InputData>& data) {
 void usage(char* argv[]) {
     std::cout << "Usage: " << argv[0] <<" [OPTIONS]" << std::endl
               << "Options:" << std::endl
-              << "  -f, --file <file>    Advent of code sample file" << std::endl
-              << "  -debug, --debug      Sets debug flag" << std::endl;
+              << "  -f, --file <file>    Advent of code sample file" << std::endl;
 
     return;
 }
@@ -254,7 +252,7 @@ std::string parseArgs(std::int32_t& argc, char* argv[]) {
 void parseFile(std::string& filename, 
                std::unique_ptr<InputData>& data, 
                std::function<void(std::istringstream, std::unique_ptr<InputData>&)> func) {
-                
+
     std::ifstream file(filename);
     std::string line;
 
