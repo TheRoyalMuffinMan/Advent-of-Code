@@ -20,6 +20,7 @@ void solvePartOne(std::unique_ptr<InputData>& data) {
     std::int32_t answer = 0;
     std::string const code = data->code;
     std::regex const pattern(R"(mul\((\d+),(\d+)\))");
+    // mul\((\d+),(\d+)\)
 
     for (std::sregex_iterator it{code.begin(), code.end(), pattern}, end{}; it != end; it++) {
         std::int32_t left = std::stoi(it->str(1));
@@ -31,8 +32,22 @@ void solvePartOne(std::unique_ptr<InputData>& data) {
 }
 
 void solvePartTwo(std::unique_ptr<InputData>& data) {
+    std::int32_t answer = 0;
+    std::string const code = data->code;
+    std::regex const pattern(R"((?:don't\(\))|(?:do\(\))|mul\((\d+),(\d+)\))");
+    bool mult_enabled = true;
 
-    std::cout << "Part 2 Answer: " << 1 << std::endl;
+    for (std::sregex_iterator it{code.begin(), code.end(), pattern}, end{}; it != end; it++) {
+        if (it->str() == "don't()" || it->str() == "do()") {
+            mult_enabled = it->str() == "do()";
+            continue;
+        }
+        std::int32_t left = std::stoi(it->str(1));
+        std::int32_t right = std::stoi(it->str(2));
+        answer += (mult_enabled) ? left * right : 0;
+    }
+
+    std::cout << "Part 2 Answer: " << answer << std::endl;
 }
 
 void usage(char* argv[]) {
@@ -98,9 +113,9 @@ int main(std::int32_t argc, char* argv[]) {
     std::string filename = parseArgs(argc, argv);
     parseFile(filename, data, dayOneParse);
 
-    // Day 1: Find safe levels
+    // Day 1: Decrypt program for mul()
     solvePartOne(data);
 
-    // Day 2: Find safe levels but can remove one bad level
+    // Day 2: Decrypt program for mul() and check for do/don't()
     solvePartTwo(data);
 }
