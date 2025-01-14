@@ -20,8 +20,8 @@ typedef struct {
 } InputData;
 
 std::int32_t checkIfCanPrint(std::size_t index, 
-                     std::vector<std::int32_t>& pages,
-                     std::unordered_map<std::int32_t, std::unordered_set<std::int32_t>>& order) {
+                             std::vector<std::int32_t>& pages,
+                             std::unordered_map<std::int32_t, std::unordered_set<std::int32_t>>& order) {
     for (std::size_t i = index + 1; i < pages.size(); i++) {
         if (order[pages[index]].find(pages[i]) != order[pages[index]].end()) {
             return i;
