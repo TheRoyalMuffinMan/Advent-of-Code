@@ -1,6 +1,5 @@
 #include <regex>
 #include <memory>
-#include <vector>
 #include <string>
 #include <cstdint>
 #include <fstream>
