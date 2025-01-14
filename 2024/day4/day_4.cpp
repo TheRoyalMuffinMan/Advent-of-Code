@@ -1,5 +1,3 @@
-#include <regex>
-#include <queue>
 #include <memory>
 #include <vector>
 #include <string>
@@ -15,6 +13,7 @@
 
 // Set to 0 to disable debugging
 #define DDEBUG 1
+#define XMAS_LENGTH 4
 
 typedef struct {
     std::vector<std::string> grid;
@@ -24,6 +23,7 @@ typedef struct {
     std::int32_t col;
     char current;
 } Element;
+
 std::vector<std::pair<std::int32_t, std::int32_t>> ADJACENT = {
     {0, 1}, {0, -1}, {1, 0}, {-1, 0},
     {1, 1}, {-1, 1}, {1, -1}, {-1, -1} 
@@ -32,42 +32,45 @@ std::unordered_map<char, char> NEXT_CHAR = {
     {'X', 'M'}, {'M', 'A'}, {'A', 'S'}, {'S', '!'}
 };
 
+auto isValid = [](std::unique_ptr<InputData>& data, std::int32_t row, std::int32_t col) {
+    return row >= 0 && row < data->grid.size() && col >= 0 && col < data->grid[0].size();
+};
+
 std::int32_t foundXMAS(std::unique_ptr<InputData>& data, Element start) {
     std::int32_t answer = 0;
-    std::queue<Element> positions;
-    std::unordered_set<std::string> seen;
-    positions.push(start);
-    auto isValid = [](std::unique_ptr<InputData>& data, std::int32_t row, std::int32_t col) {
-        return row >= 0 && row < data->grid.size() && col >= 0 && col < data->grid[0].size();
-    };
-    std::cout << start.row << ", " << start.col << ", " << start.current << std::endl;
 
-    while (!positions.empty()) {
-        Element top = positions.front();
-        std::string lookup = std::to_string(top.row) + std::to_string(top.col);
-        positions.pop();
-
-        if (seen.find(lookup) == seen.end()) {
-            continue;
-        }
-        seen.insert(lookup);
-
-        for (auto adj : ADJACENT) {
-            std::int32_t rowF = top.row + adj.first;
-            std::int32_t colF = top.col + adj.second;
-
-            // Check if the next character is valid
-            if (isValid(data, rowF, colF) && NEXT_CHAR.find(data->grid[rowF][colF]) != NEXT_CHAR.end()) {
-                if (NEXT_CHAR[data->grid[rowF][colF]] == '!') {
-                    answer++;
-                    continue;
-                }
-                positions.push({rowF, colF, data->grid[rowF][colF]});
-            }
+    for (auto adj : ADJACENT) {
+        std::int32_t nR = start.row, nC = start.col;
+        char prev = start.current;
+        for (std::size_t dist = 1; dist < XMAS_LENGTH; dist++) {
+            nR += adj.first, nC += adj.second;
+            if (!isValid(data, nR, nC)) break; 
+            if (dist == XMAS_LENGTH - 1 && data->grid[nR][nC] == 'S') answer++;
+            if (data->grid[nR][nC] != NEXT_CHAR[prev]) break;
+            prev = data->grid[nR][nC];
         }
     }
 
     return answer;
+}
+
+std::int32_t checkXMAS(std::unique_ptr<InputData>& data, Element middle) {
+    std::unordered_set<std::string> xmas = {"MAS", "SAM"};
+    std::string left = "", right = "";
+
+    if (isValid(data, middle.row - 1, middle.col - 1) && isValid(data, middle.row - 1, middle.col + 1)) {
+        left += data->grid[middle.row - 1][middle.col - 1], right += data->grid[middle.row - 1][middle.col + 1];
+    }
+    left += middle.current, right += middle.current; 
+    if (isValid(data, middle.row + 1, middle.col - 1) && isValid(data, middle.row + 1, middle.col + 1)) {
+        right += data->grid[middle.row + 1][middle.col - 1], left += data->grid[middle.row + 1][middle.col + 1];
+    }
+
+    if (left.size() != XMAS_LENGTH - 1 || right.size() != XMAS_LENGTH - 1 || xmas.find(left) == xmas.end() || xmas.find(right) == xmas.end()) {
+        return 0;
+    }
+
+    return 1;
 }
 
 void solvePartOne(std::unique_ptr<InputData>& data) {
@@ -92,7 +95,23 @@ void solvePartOne(std::unique_ptr<InputData>& data) {
 }
 
 void solvePartTwo(std::unique_ptr<InputData>& data) {
+    std::vector<std::pair<std::int32_t, std::int32_t>> A_locations;
     std::int32_t answer = 0;
+
+
+    // Locate the A positions in the grid
+    for (std::size_t row = 0; row < data->grid.size(); row++) {
+        for (std::size_t col = 0; col < data->grid[row].size(); col++) {
+            if (data->grid[row][col] == 'A') {
+                A_locations.push_back({row, col});
+            }
+        }
+    }
+
+    // Run X-MAS check at each A 
+    for (auto start : A_locations) {
+        answer += checkXMAS(data, {start.first, start.second, 'A'});
+    }
 
     std::cout << "Part 2 Answer: " << answer << std::endl;
 }
